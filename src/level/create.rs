@@ -46,17 +46,84 @@ fn create_level_geometry(
 ) {
     for (y, row) in level.grid.iter().enumerate() {
         for (x, tile) in row.iter().enumerate() {
-            let translation =
-                Vec3::new(x as f32 * TILE_SIZE, -TILE_SIZE / 2.0, y as f32 * TILE_SIZE);
+            match tile {
+                Tile::Void => { /* do nothing */ }
+                tile => {
+                    /* Ground */
+                    let translation =
+                        Vec3::new(x as f32 * TILE_SIZE, -TILE_SIZE / 2.0, y as f32 * TILE_SIZE);
+                    commands
+                        .spawn(PbrBundle {
+                            mesh: tile_mesh.clone(),
+                            material: tile_materials.get(tile).unwrap().clone(),
+                            transform: Transform::from_translation(translation),
+                            ..default()
+                        })
+                        .insert(LevelGeometry);
 
-            commands
-                .spawn(PbrBundle {
-                    mesh: tile_mesh.clone(),
-                    material: tile_materials.get(tile).unwrap().clone(),
-                    transform: Transform::from_translation(translation),
-                    ..default()
-                })
-                .insert(LevelGeometry);
+                    /* North Wall */
+                    if (y == 0) || matches!(level.grid[y - 1][x], Tile::Void) {
+                        let translation =
+                            translation + Vec3::new(0.0, TILE_SIZE / 2.0, -TILE_SIZE / 2.0);
+
+                        commands
+                            .spawn(PbrBundle {
+                                mesh: tile_mesh.clone(),
+                                material: tile_materials.get(tile).unwrap().clone(),
+                                transform: Transform::from_translation(translation)
+                                    .looking_to(Vec3::Y, Vec3::Z),
+                                ..default()
+                            })
+                            .insert(LevelGeometry);
+                    }
+                    /* South Wall */
+                    if (y == level.grid.len() - 1) || matches!(level.grid[y + 1][x], Tile::Void) {
+                        let translation =
+                            translation + Vec3::new(0.0, TILE_SIZE / 2.0, TILE_SIZE / 2.0);
+
+                        commands
+                            .spawn(PbrBundle {
+                                mesh: tile_mesh.clone(),
+                                material: tile_materials.get(tile).unwrap().clone(),
+                                transform: Transform::from_translation(translation)
+                                    .looking_to(Vec3::Y, -Vec3::Z),
+                                ..default()
+                            })
+                            .insert(LevelGeometry);
+                    }
+                    /* West Wall */
+                    if (x == 0) || matches!(level.grid[y][x - 1], Tile::Void) {
+                        let translation =
+                            translation + Vec3::new(-TILE_SIZE / 2.0, TILE_SIZE / 2.0, 0.0);
+
+                        commands
+                            .spawn(PbrBundle {
+                                mesh: tile_mesh.clone(),
+                                material: tile_materials.get(tile).unwrap().clone(),
+                                transform: Transform::from_translation(translation)
+                                    .looking_to(Vec3::Y, Vec3::X),
+                                ..default()
+                            })
+                            .insert(LevelGeometry);
+                    }
+                    /* East Wall */
+                    if (x == level.grid[y].len() - 1) || matches!(level.grid[y][x + 1], Tile::Void)
+                    {
+                        let translation =
+                            translation + Vec3::new(TILE_SIZE / 2.0, TILE_SIZE / 2.0, 0.0);
+
+                        commands
+                            .spawn(PbrBundle {
+                                mesh: tile_mesh.clone(),
+                                material: tile_materials.get(tile).unwrap().clone(),
+                                transform: Transform::from_translation(translation)
+                                    .looking_to(Vec3::Y, -Vec3::X),
+                                ..default()
+                            })
+                            .insert(LevelGeometry);
+                    }
+                }
+            }
         }
     }
 }

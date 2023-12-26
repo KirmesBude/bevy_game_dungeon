@@ -2,6 +2,7 @@ mod asset;
 mod create;
 
 use bevy::prelude::*;
+use bevy_flycam::FlyCam;
 use serde::Deserialize;
 
 use crate::{loading::LevelAssets, GameState};
@@ -43,26 +44,40 @@ pub enum Tile {
     Stone,
 }
 
+/* TODO: Move somewhere else */
+#[derive(Debug, Default, Component)]
+pub struct Player;
+
 fn setup(
     mut commands: Commands,
     mut change_level_evw: EventWriter<ChangeLevel>,
     level_assets: Res<LevelAssets>,
 ) {
-    commands.spawn(PointLightBundle {
-        point_light: PointLight {
-            intensity: 9000.0,
-            range: 100.,
-            shadows_enabled: true,
-            ..default()
-        },
-        transform: Transform::from_xyz(8.0, 16.0, 8.0),
-        ..default()
-    });
+    commands
+        .spawn((
+            Player,
+            SpatialBundle {
+                transform: Transform::from_xyz(0.0, 6., 12.0)
+                    .looking_at(Vec3::new(32., 1., 32.), Vec3::Y),
+                ..default()
+            },
+            FlyCam,
+        ))
+        .with_children(|parent| {
+            parent.spawn(PointLightBundle {
+                point_light: PointLight {
+                    color: Color::YELLOW,
+                    intensity: 9000.0,
+                    range: 64.0,
+                    radius: 64.0,
+                    shadows_enabled: true,
+                    ..default()
+                },
+                ..default()
+            });
 
-    commands.spawn(Camera3dBundle {
-        transform: Transform::from_xyz(0.0, 6., 12.0).looking_at(Vec3::new(32., 1., 32.), Vec3::Y),
-        ..default()
-    });
+            parent.spawn(Camera3dBundle::default());
+        });
 
     change_level_evw.send(ChangeLevel(level_assets.start.clone()));
 }

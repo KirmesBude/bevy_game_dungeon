@@ -12,6 +12,7 @@ use bevy::app::App;
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
+use bevy_flycam::NoCameraPlayerPlugin;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use level::LevelPlugin;
 
@@ -42,6 +43,7 @@ impl Plugin for GamePlugin {
             app.add_plugins(
                 WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::Escape)),
             );
+            app.add_plugins(NoCameraPlayerPlugin);
         }
     }
 }

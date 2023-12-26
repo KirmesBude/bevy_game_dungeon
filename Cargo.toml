@@ -1,0 +1,34 @@
+[package]
+name = "bevy_game_dungeon"
+version = "0.1.0"
+edition = "2021"
+exclude = ["dist", "build", "assets", "credits"]
+
+[profile.dev.package."*"]
+opt-level = 3
+
+[profile.dev]
+opt-level = 1
+
+[profile.release]
+lto = true
+codegen-units = 1
+
+# The profile that 'cargo dist' will build with
+[profile.dist]
+inherits = "release"
+lto = "thin"
+
+[features]
+dev = [
+    "bevy/dynamic_linking",
+]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = "0.12"
+bevy_asset_loader = "0.18"
+bevy-inspector-egui = "0.21"
+
+webbrowser = { version = "0.8", features = ["hardened"] }

@@ -1,10 +1,8 @@
 (
     grid: [
-        [Void, Void, Void, Void, Void],
-        [Void, Stone, Stone, Stone, Void],
-        [Void, Stone, Stone, Stone, Void],
-        [Void, Stone, Stone, Stone, Void],
-        [Void, Void, Void, Void, Void],
+        [Stone, Stone, Stone],
+        [Stone, Stone, Stone],
+        [Stone, Stone, Stone],
     ],
-    start_pos: (2, 2),
+    start_pos: (1, 1),
 )

@@ -671,6 +671,9 @@ dependencies = [
  "bevy",
  "bevy-inspector-egui",
  "bevy_asset_loader",
+ "ron",
+ "serde",
+ "thiserror",
  "webbrowser",
 ]
 

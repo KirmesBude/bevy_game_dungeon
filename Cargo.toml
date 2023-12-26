@@ -32,3 +32,6 @@ bevy_asset_loader = "0.18"
 bevy-inspector-egui = "0.21"
 
 webbrowser = { version = "0.8", features = ["hardened"] }
+ron = "0.8"
+serde = { version = "1", features = ["derive"] }
+thiserror = "1.0.52"

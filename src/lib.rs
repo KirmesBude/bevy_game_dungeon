@@ -1,5 +1,6 @@
 #![allow(clippy::type_complexity)]
 
+mod level;
 mod loading;
 mod menu;
 
@@ -12,6 +13,7 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use level::LevelPlugin;
 
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
@@ -31,10 +33,8 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<GameState>().add_plugins((
-            LoadingPlugin,
-            MenuPlugin,
-        ));
+        app.add_state::<GameState>()
+            .add_plugins((LoadingPlugin, MenuPlugin, LevelPlugin));
 
         #[cfg(debug_assertions)]
         {

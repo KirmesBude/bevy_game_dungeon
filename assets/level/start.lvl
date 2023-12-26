@@ -1,0 +1,9 @@
+(
+    grid: [
+        [Void, Void, Void, Void, Void],
+        [Void, Stone, Stone, Stone, Void],
+        [Void, Stone, Stone, Stone, Void],
+        [Void, Stone, Stone, Stone, Void],
+        [Void, Void, Void, Void, Void],
+    ],
+)

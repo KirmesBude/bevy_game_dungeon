@@ -3,6 +3,11 @@
         [Stone, Stone, Stone],
         [Stone, Stone, Stone],
         [Stone, Stone, Stone],
+        [Void, Stone, Void],
+        [Void, Stone, Void],
+        [Void, Stone, Void],
+        [Void, Stone, Void],
+        [Stone, Stone, Stone],
     ],
     start_pos: (1, 1),
 )

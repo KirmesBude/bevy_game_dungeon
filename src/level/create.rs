@@ -180,7 +180,7 @@ pub fn move_player_to_start_pos(
             );
 
             transform.translation = translation;
-            transform.look_to(-Vec3::Z, Vec3::Y);
+            transform.look_to(Vec3::Z, Vec3::Y);
         }
     }
 }

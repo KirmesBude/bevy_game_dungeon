@@ -6,4 +6,5 @@
         [Void, Stone, Stone, Stone, Void],
         [Void, Void, Void, Void, Void],
     ],
+    start_pos: (2, 2),
 )

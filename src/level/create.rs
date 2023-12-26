@@ -1,6 +1,6 @@
 use bevy::{prelude::*, utils::HashMap};
 
-use super::{asset::Level, Tile, TILE_SIZE};
+use super::{asset::Level, Player, Tile, TILE_SIZE};
 
 /// Holds a Handle to a Level Asset of the currently loaded level
 #[derive(Debug, Default, Resource, Deref)]
@@ -161,5 +161,26 @@ pub fn level_change_create(
         let level = level_assets.get(event.0.clone()).unwrap();
 
         create_level_geometry(&mut commands, level, &tile_mesh.0, &tile_materials.0);
+    }
+}
+
+pub fn move_player_to_start_pos(
+    mut change_level_evr: EventReader<ChangeLevel>,
+    level_assets: Res<Assets<Level>>,
+    mut player_pos: Query<&mut Transform, With<Player>>,
+) {
+    for event in change_level_evr.read() {
+        let level = level_assets.get(event.0.clone()).unwrap();
+
+        for mut transform in &mut player_pos {
+            let translation = Vec3::new(
+                level.start_pos.0 as f32 * TILE_SIZE,
+                0.0,
+                level.start_pos.1 as f32 * TILE_SIZE,
+            );
+
+            transform.translation = translation;
+            transform.look_to(-Vec3::Z, Vec3::Y);
+        }
     }
 }

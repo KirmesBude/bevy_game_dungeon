@@ -9,7 +9,10 @@ use crate::{loading::LevelAssets, GameState};
 
 use self::{
     asset::LevelAssetLoader,
-    create::{level_change_create, level_change_despawn, TileMaterials, TileMesh},
+    create::{
+        level_change_create, level_change_despawn, move_player_to_start_pos, TileMaterials,
+        TileMesh,
+    },
 };
 
 pub use asset::Level;
@@ -28,7 +31,11 @@ impl Plugin for LevelPlugin {
             .add_systems(OnEnter(GameState::Playing), setup)
             .add_systems(
                 Update,
-                (level_change_despawn, level_change_create)
+                (
+                    level_change_despawn,
+                    level_change_create,
+                    move_player_to_start_pos,
+                )
                     .chain()
                     .run_if(in_state(GameState::Playing)),
             );

@@ -13,6 +13,7 @@ use bevy::{
 #[derive(Debug, Default, Deserialize, Asset, TypePath)]
 pub struct Level {
     pub grid: Vec<Vec<Tile>>,
+    pub start_pos: (usize, usize),
 }
 
 #[non_exhaustive]

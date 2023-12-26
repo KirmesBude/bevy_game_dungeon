@@ -122,6 +122,18 @@ fn create_level_geometry(
                             })
                             .insert(LevelGeometry);
                     }
+
+                    /* Ceiling */
+                    let translation =
+                        Vec3::new(x as f32 * TILE_SIZE, TILE_SIZE / 2.0, y as f32 * TILE_SIZE);
+                    commands
+                        .spawn(PbrBundle {
+                            mesh: tile_mesh.clone(),
+                            material: tile_materials.get(tile).unwrap().clone(),
+                            transform: Transform::from_translation(translation).looking_to(-Vec3::X, -Vec3::Y), /* All of these rotations make no sense */
+                            ..default()
+                        })
+                        .insert(LevelGeometry);
                 }
             }
         }

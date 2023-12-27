@@ -13,6 +13,7 @@ impl Plugin for LoadingPlugin {
             LoadingState::new(GameState::Loading).continue_to_state(GameState::Menu),
         )
         .add_collection_to_loading_state::<_, TextureAssets>(GameState::Loading)
+        .add_collection_to_loading_state::<_, TileTextureAssets>(GameState::Loading)
         .add_collection_to_loading_state::<_, LevelAssets>(GameState::Loading);
     }
 }
@@ -20,7 +21,7 @@ impl Plugin for LoadingPlugin {
 // the following asset collections will be loaded during the State `GameState::Loading`
 // when done loading, they will be inserted as resources (see <https://github.com/NiklasEi/bevy_asset_loader>)
 
-#[derive(AssetCollection, Resource)]
+#[derive(Debug, AssetCollection, Resource)]
 pub struct TextureAssets {
     #[asset(path = "bevy.png")]
     pub bevy: Handle<Image>,
@@ -28,8 +29,15 @@ pub struct TextureAssets {
     pub github: Handle<Image>,
 }
 
-#[derive(AssetCollection, Resource)]
+#[derive(Debug, AssetCollection, Resource)]
 pub struct LevelAssets {
     #[asset(path = "level/start.lvl")]
     pub start: Handle<Level>,
+}
+
+#[derive(Debug, AssetCollection, Resource)]
+pub struct TileTextureAssets {
+    #[asset(standard_material)]
+    #[asset(path = "stone.png")]
+    pub stone: Handle<StandardMaterial>,
 }

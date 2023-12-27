@@ -5,14 +5,14 @@ use bevy::prelude::*;
 use bevy_flycam::FlyCam;
 use serde::Deserialize;
 
-use crate::{loading::LevelAssets, GameState};
+use crate::{
+    loading::{LevelAssets, TileTextureAssets},
+    GameState,
+};
 
 use self::{
     asset::LevelAssetLoader,
-    create::{
-        level_change_create, level_change_despawn, move_player_to_start_pos, TileMaterials,
-        TileMesh,
-    },
+    create::{level_change_create, level_change_despawn, move_player_to_start_pos, TileMesh},
 };
 
 pub use asset::Level;
@@ -24,7 +24,6 @@ impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<CurrentLevel>()
             .init_resource::<TileMesh>()
-            .init_resource::<TileMaterials>()
             .init_asset::<Level>()
             .init_asset_loader::<LevelAssetLoader>()
             .add_event::<ChangeLevel>()
@@ -49,6 +48,15 @@ pub enum Tile {
     #[default]
     Void,
     Stone,
+}
+
+impl TileTextureAssets {
+    pub fn get(&self, tile: &Tile) -> Option<Handle<StandardMaterial>> {
+        match tile {
+            Tile::Stone => Some(self.stone.clone()),
+            Tile::Void => None,
+        }
+    }
 }
 
 /* TODO: Move somewhere else */

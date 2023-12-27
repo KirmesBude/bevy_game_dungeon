@@ -1,4 +1,6 @@
-use bevy::{prelude::*, utils::HashMap};
+use bevy::prelude::*;
+
+use crate::loading::TileTextureAssets;
 
 use super::{asset::Level, Player, Tile, TILE_SIZE};
 
@@ -18,22 +20,6 @@ impl FromWorld for TileMesh {
     }
 }
 
-/// Holds a Handle to a Level Asset of the currently loaded level
-#[derive(Debug, Resource, Deref)]
-pub struct TileMaterials(HashMap<Tile, Handle<StandardMaterial>>);
-
-impl FromWorld for TileMaterials {
-    fn from_world(world: &mut World) -> Self {
-        let mut materials: Mut<Assets<StandardMaterial>> = world.get_resource_mut().unwrap();
-        let mut hash_map = HashMap::new();
-
-        hash_map.insert(Tile::Void, materials.add(Color::BLACK.into()));
-        hash_map.insert(Tile::Stone, materials.add(Color::ORANGE_RED.into()));
-
-        TileMaterials(hash_map)
-    }
-}
-
 /// Marker Component so all level specific entities can be despawned of level change
 #[derive(Debug, Default, Component)]
 pub struct LevelGeometry;
@@ -42,20 +28,22 @@ fn create_level_geometry(
     commands: &mut Commands,
     level: &Level,
     tile_mesh: &Handle<Mesh>,
-    tile_materials: &HashMap<Tile, Handle<StandardMaterial>>,
+    tile_textures: &TileTextureAssets,
 ) {
     for (y, row) in level.grid.iter().enumerate() {
         for (x, tile) in row.iter().enumerate() {
             match tile {
                 Tile::Void => { /* do nothing */ }
                 tile => {
+                    let material = tile_textures.get(tile).unwrap();
+
                     /* Ground */
                     let translation =
                         Vec3::new(x as f32 * TILE_SIZE, -TILE_SIZE / 2.0, y as f32 * TILE_SIZE);
                     commands
                         .spawn(PbrBundle {
                             mesh: tile_mesh.clone(),
-                            material: tile_materials.get(tile).unwrap().clone(),
+                            material: material.clone(),
                             transform: Transform::from_translation(translation),
                             ..default()
                         })
@@ -69,7 +57,7 @@ fn create_level_geometry(
                         commands
                             .spawn(PbrBundle {
                                 mesh: tile_mesh.clone(),
-                                material: tile_materials.get(tile).unwrap().clone(),
+                                material: material.clone(),
                                 transform: Transform::from_translation(translation)
                                     .looking_to(Vec3::Y, Vec3::Z),
                                 ..default()
@@ -84,7 +72,7 @@ fn create_level_geometry(
                         commands
                             .spawn(PbrBundle {
                                 mesh: tile_mesh.clone(),
-                                material: tile_materials.get(tile).unwrap().clone(),
+                                material: material.clone(),
                                 transform: Transform::from_translation(translation)
                                     .looking_to(Vec3::Y, -Vec3::Z),
                                 ..default()
@@ -99,7 +87,7 @@ fn create_level_geometry(
                         commands
                             .spawn(PbrBundle {
                                 mesh: tile_mesh.clone(),
-                                material: tile_materials.get(tile).unwrap().clone(),
+                                material: material.clone(),
                                 transform: Transform::from_translation(translation)
                                     .looking_to(Vec3::Y, Vec3::X),
                                 ..default()
@@ -115,7 +103,7 @@ fn create_level_geometry(
                         commands
                             .spawn(PbrBundle {
                                 mesh: tile_mesh.clone(),
-                                material: tile_materials.get(tile).unwrap().clone(),
+                                material: material.clone(),
                                 transform: Transform::from_translation(translation)
                                     .looking_to(Vec3::Y, -Vec3::X),
                                 ..default()
@@ -129,7 +117,7 @@ fn create_level_geometry(
                     commands
                         .spawn(PbrBundle {
                             mesh: tile_mesh.clone(),
-                            material: tile_materials.get(tile).unwrap().clone(),
+                            material: material.clone(),
                             transform: Transform::from_translation(translation).looking_to(-Vec3::X, -Vec3::Y), /* All of these rotations make no sense */
                             ..default()
                         })
@@ -164,7 +152,7 @@ pub fn level_change_create(
     mut change_level_evr: EventReader<ChangeLevel>,
     mut current_level: ResMut<CurrentLevel>,
     tile_mesh: Res<TileMesh>,
-    tile_materials: Res<TileMaterials>,
+    tile_textures: Res<TileTextureAssets>,
     level_assets: Res<Assets<Level>>,
 ) {
     for event in change_level_evr.read() {
@@ -172,7 +160,7 @@ pub fn level_change_create(
 
         let level = level_assets.get(event.0.clone()).unwrap();
 
-        create_level_geometry(&mut commands, level, &tile_mesh.0, &tile_materials.0);
+        create_level_geometry(&mut commands, level, &tile_mesh.0, &tile_textures);
     }
 }
 

@@ -6,7 +6,9 @@ use bevy_flycam::FlyCam;
 use serde::Deserialize;
 
 use crate::{
+    controls::Controllable,
     loading::{LevelAssets, TileTextureAssets},
+    movement::{GridDirection, GridPosition},
     GameState,
 };
 
@@ -41,7 +43,7 @@ impl Plugin for LevelPlugin {
     }
 }
 
-const TILE_SIZE: f32 = 32.0;
+pub const TILE_SIZE: f32 = 32.0;
 
 #[derive(Debug, Default, Deserialize, Eq, Hash, PartialEq)]
 pub enum Tile {
@@ -71,12 +73,11 @@ fn setup(
     commands
         .spawn((
             Player,
-            SpatialBundle {
-                transform: Transform::from_xyz(0.0, 6., 12.0)
-                    .looking_at(Vec3::new(32., 1., 32.), Vec3::Y),
-                ..default()
-            },
+            SpatialBundle::default(),
             FlyCam,
+            Controllable,
+            GridPosition::default(),
+            GridDirection::default(),
         ))
         .with_children(|parent| {
             parent.spawn(PointLightBundle {

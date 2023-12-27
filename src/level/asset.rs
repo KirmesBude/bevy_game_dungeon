@@ -14,6 +14,7 @@ use bevy::{
 pub struct Level {
     pub grid: Vec<Vec<Tile>>,
     pub start_pos: (usize, usize),
+    pub end_pos: (usize, usize),
 }
 
 #[non_exhaustive]

@@ -1,13 +1,14 @@
 (
     grid: [
-        [Stone, Stone, Stone],
-        [Stone, Stone, Stone],
-        [Stone, Stone, Stone],
-        [Void, Stone, Void],
-        [Void, Stone, Void],
-        [Void, Stone, Void],
-        [Void, Stone, Void],
-        [Stone, Stone, Stone],
+        [Stone, Stone, Stone, Void, Void],
+        [Stone, Stone, Stone, Void, Void],
+        [Stone, Stone, Stone, Void, Void],
+        [Void, Stone, Void, Void, Void],
+        [Void, Stone, Void, Void, Void],
+        [Void, Stone, Void, Void, Void],
+        [Void, Stone, Void, Void, Void],
+        [Void, Stone, Stone, Stone, Stone],
     ],
     start_pos: (1, 1),
+    end_pos: (4, 7),
 )

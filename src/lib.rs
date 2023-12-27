@@ -1,8 +1,10 @@
 #![allow(clippy::type_complexity)]
 
+mod controls;
 mod level;
 mod loading;
 mod menu;
+mod movement;
 
 use crate::loading::LoadingPlugin;
 use crate::menu::MenuPlugin;
@@ -10,11 +12,16 @@ use crate::menu::MenuPlugin;
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+#[cfg(debug_assertions)]
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
+#[cfg(debug_assertions)]
 use bevy_flycam::NoCameraPlayerPlugin;
+#[cfg(debug_assertions)]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use controls::ControlsPlugin;
 use level::LevelPlugin;
+use movement::MovementPlugin;
 
 // This example game uses States to separate logic
 // See https://bevy-cheatbook.github.io/programming/states.html
@@ -34,8 +41,13 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<GameState>()
-            .add_plugins((LoadingPlugin, MenuPlugin, LevelPlugin));
+        app.add_state::<GameState>().add_plugins((
+            LoadingPlugin,
+            MenuPlugin,
+            LevelPlugin,
+            MovementPlugin,
+            ControlsPlugin,
+        ));
 
         #[cfg(debug_assertions)]
         {

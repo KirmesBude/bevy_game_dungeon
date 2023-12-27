@@ -1,12 +1,12 @@
 use bevy::prelude::*;
 
-use crate::loading::TileTextureAssets;
+use crate::{loading::TileTextureAssets, movement::GridPosition};
 
 use super::{asset::Level, Player, Tile, TILE_SIZE};
 
 /// Holds a Handle to a Level Asset of the currently loaded level
 #[derive(Debug, Default, Resource, Deref)]
-pub struct CurrentLevel(Handle<Level>);
+pub struct CurrentLevel(pub Handle<Level>);
 
 /// Holds a Handle to a Level Asset of the currently loaded level
 #[derive(Debug, Resource, Deref)]
@@ -158,7 +158,7 @@ pub fn level_change_create(
     for event in change_level_evr.read() {
         current_level.0 = event.0.clone();
 
-        let level = level_assets.get(event.0.clone()).unwrap();
+        let level = level_assets.get(&event.0).unwrap();
 
         create_level_geometry(&mut commands, level, &tile_mesh.0, &tile_textures);
     }
@@ -167,20 +167,14 @@ pub fn level_change_create(
 pub fn move_player_to_start_pos(
     mut change_level_evr: EventReader<ChangeLevel>,
     level_assets: Res<Assets<Level>>,
-    mut player_pos: Query<&mut Transform, With<Player>>,
+    mut player_pos: Query<&mut GridPosition, With<Player>>,
 ) {
     for event in change_level_evr.read() {
-        let level = level_assets.get(event.0.clone()).unwrap();
+        let level = level_assets.get(&event.0).unwrap();
 
-        for mut transform in &mut player_pos {
-            let translation = Vec3::new(
-                level.start_pos.0 as f32 * TILE_SIZE,
-                0.0,
-                level.start_pos.1 as f32 * TILE_SIZE,
-            );
-
-            transform.translation = translation;
-            transform.look_to(Vec3::Z, Vec3::Y);
+        for mut grid_position in &mut player_pos {
+            grid_position.x = level.start_pos.0;
+            grid_position.y = level.start_pos.1;
         }
     }
 }

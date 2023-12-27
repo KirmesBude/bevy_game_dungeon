@@ -41,7 +41,7 @@ impl Plugin for GamePlugin {
         {
             app.add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default()));
             app.add_plugins(
-                WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::Escape)),
+                WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::I)),
             );
             app.add_plugins(NoCameraPlayerPlugin);
         }

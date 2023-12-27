@@ -1,12 +1,11 @@
 use bevy::prelude::*;
 
-use crate::{loading::TileTextureAssets, movement::GridPosition};
+use crate::{
+    loading::TileTextureAssets,
+    movement::{GridDirection, GridPosition},
+};
 
-use super::{asset::Level, Player, Tile, TILE_SIZE};
-
-/// Holds a Handle to a Level Asset of the currently loaded level
-#[derive(Debug, Default, Resource, Deref)]
-pub struct CurrentLevel(pub Handle<Level>);
+use super::{asset::Level, change::ChangeLevel, CurrentLevel, Player, Tile, TILE_SIZE};
 
 /// Holds a Handle to a Level Asset of the currently loaded level
 #[derive(Debug, Resource, Deref)]
@@ -17,6 +16,15 @@ impl FromWorld for TileMesh {
         let mut meshes: Mut<Assets<Mesh>> = world.get_resource_mut().unwrap();
 
         TileMesh(meshes.add(shape::Plane::from_size(TILE_SIZE).into()))
+    }
+}
+
+impl TileTextureAssets {
+    pub fn get(&self, tile: &Tile) -> Option<Handle<StandardMaterial>> {
+        match tile {
+            Tile::Stone => Some(self.stone.clone()),
+            Tile::Void => None,
+        }
     }
 }
 
@@ -134,15 +142,13 @@ fn despawn_level_geometry(commands: &mut Commands, entities: &Query<Entity, With
     }
 }
 
-#[derive(Debug, Event)]
-pub struct ChangeLevel(pub Handle<Level>);
-
 pub fn level_change_despawn(
     mut commands: Commands,
     mut change_level_evr: EventReader<ChangeLevel>,
     level_entities: Query<Entity, With<LevelGeometry>>,
 ) {
     for _ in change_level_evr.read() {
+        info!("Despawning...");
         despawn_level_geometry(&mut commands, &level_entities);
     }
 }
@@ -156,6 +162,7 @@ pub fn level_change_create(
     level_assets: Res<Assets<Level>>,
 ) {
     for event in change_level_evr.read() {
+        info!("Creating...");
         current_level.0 = event.0.clone();
 
         let level = level_assets.get(&event.0).unwrap();
@@ -167,14 +174,15 @@ pub fn level_change_create(
 pub fn move_player_to_start_pos(
     mut change_level_evr: EventReader<ChangeLevel>,
     level_assets: Res<Assets<Level>>,
-    mut player_pos: Query<&mut GridPosition, With<Player>>,
+    mut player_pos: Query<(&mut GridPosition, &mut GridDirection), With<Player>>,
 ) {
     for event in change_level_evr.read() {
+        info!("Moving player to start...");
         let level = level_assets.get(&event.0).unwrap();
 
-        for mut grid_position in &mut player_pos {
-            grid_position.x = level.start_pos.0;
-            grid_position.y = level.start_pos.1;
+        for (mut grid_position, mut grid_direction) in &mut player_pos {
+            *grid_position = level.start_pos;
+            *grid_direction = GridDirection::default();
         }
     }
 }

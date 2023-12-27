@@ -1,5 +1,5 @@
 use crate::{level::Level, GameState};
-use bevy::prelude::*;
+use bevy::{prelude::*, utils::HashMap};
 use bevy_asset_loader::prelude::*;
 
 pub struct LoadingPlugin;
@@ -31,8 +31,8 @@ pub struct TextureAssets {
 
 #[derive(Debug, AssetCollection, Resource)]
 pub struct LevelAssets {
-    #[asset(path = "level/start.lvl")]
-    pub start: Handle<Level>,
+    #[asset(path = "level", collection(typed, mapped))]
+    pub levels: HashMap<String, Handle<Level>>,
 }
 
 #[derive(Debug, AssetCollection, Resource)]

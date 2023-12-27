@@ -1,6 +1,8 @@
 use serde::Deserialize;
 use thiserror::Error;
 
+use crate::movement::GridPosition;
+
 use super::Tile;
 
 use bevy::{
@@ -13,8 +15,9 @@ use bevy::{
 #[derive(Debug, Default, Deserialize, Asset, TypePath)]
 pub struct Level {
     pub grid: Vec<Vec<Tile>>,
-    pub start_pos: (usize, usize),
-    pub end_pos: (usize, usize),
+    pub start_pos: GridPosition,
+    pub end_pos: GridPosition,
+    pub next_level: Option<String>,
 }
 
 #[non_exhaustive]

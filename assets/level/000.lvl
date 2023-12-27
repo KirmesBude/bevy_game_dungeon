@@ -9,6 +9,13 @@
         [Void, Stone, Void, Void, Void],
         [Void, Stone, Stone, Stone, Stone],
     ],
-    start_pos: (1, 1),
-    end_pos: (4, 7),
+    start_pos: (
+        x: 1,
+        y: 1,
+    ),
+    end_pos: (
+        x: 4,
+        y: 7
+    ),
+    next_level: Some("level/001.lvl"),
 )

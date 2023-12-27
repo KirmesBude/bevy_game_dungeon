@@ -1,6 +1,7 @@
 use std::num::TryFromIntError;
 
 use bevy::prelude::*;
+use serde::Deserialize;
 
 use crate::{
     level::{CurrentLevel, Level, Tile, TILE_SIZE},
@@ -25,7 +26,7 @@ impl Plugin for MovementPlugin {
     }
 }
 
-#[derive(Default, Debug, Component, Clone, Copy)]
+#[derive(Default, Debug, Component, Clone, Copy, Deserialize, PartialEq, Eq)]
 pub struct GridPosition {
     pub x: usize,
     pub y: usize,

@@ -15,6 +15,7 @@ use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
 #[cfg(debug_assertions)]
 use bevy::input::common_conditions::input_toggle_active;
 use bevy::prelude::*;
+use bevy_easings::EasingsPlugin;
 #[cfg(debug_assertions)]
 use bevy_flycam::NoCameraPlayerPlugin;
 #[cfg(debug_assertions)]
@@ -47,6 +48,7 @@ impl Plugin for GamePlugin {
             LevelPlugin,
             MovementPlugin,
             ControlsPlugin,
+            EasingsPlugin,
         ));
 
         #[cfg(debug_assertions)]

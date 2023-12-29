@@ -1,6 +1,7 @@
-use std::num::TryFromIntError;
+use std::{num::TryFromIntError, time::Duration};
 
 use bevy::prelude::*;
+use bevy_easings::{Ease, EaseFunction, EasingComponent, EasingType};
 use serde::Deserialize;
 
 use crate::{
@@ -20,7 +21,20 @@ impl Plugin for MovementPlugin {
             )
             .add_systems(
                 Update,
+                (
+                    ease_grid_position_to_translation,
+                    ease_direction_to_rotation,
+                )
+                    .run_if(in_state(GameState::Playing)),
+            )
+            .add_systems(
+                Update,
                 (grid_position_to_translation, direction_to_rotation)
+                    .run_if(in_state(GameState::Playing)),
+            )
+            .add_systems(
+                PostUpdate,
+                (end_of_ease::<GridPosition>, end_of_ease::<GridDirection>)
                     .run_if(in_state(GameState::Playing)),
             );
     }
@@ -122,6 +136,96 @@ pub struct MoveForward {
     pub entity: Entity,
 }
 
+#[derive(Debug, Component)]
+pub struct EaseTo<T: Copy> {
+    pub target: T,
+}
+
+impl<T: Copy> EaseTo<T> {
+    pub fn new(target: T) -> Self {
+        Self { target }
+    }
+}
+
+fn ease_grid_position_to_translation(
+    mut commands: Commands,
+    query: Query<(Entity, &Transform, &EaseTo<GridPosition>), Added<EaseTo<GridPosition>>>,
+) {
+    for (entity, transform, grid_position) in &query {
+        let new_grid_position = &grid_position.target;
+        let new_transform = transform.with_translation(new_grid_position.into());
+
+        commands.entity(entity).insert(transform.ease_to(
+            new_transform,
+            EaseFunction::SineInOut,
+            EasingType::Once {
+                duration: Duration::from_millis(300),
+            },
+        ));
+    }
+}
+
+fn ease_direction_to_rotation(
+    mut commands: Commands,
+    query: Query<(Entity, &Transform, &EaseTo<GridDirection>), Added<EaseTo<GridDirection>>>,
+) {
+    for (entity, transform, direction) in &query {
+        let new_direction = &direction.target;
+        let new_transform = transform.looking_to(new_direction.into(), Vec3::Y);
+
+        commands.entity(entity).insert(transform.ease_to(
+            new_transform,
+            EaseFunction::SineInOut,
+            EasingType::Once {
+                duration: Duration::from_millis(300),
+            },
+        ));
+    }
+}
+
+fn move_forward(
+    mut commands: Commands,
+    mut move_forward_evr: EventReader<MoveForward>,
+    query: Query<(&GridPosition, &GridDirection), Without<EasingComponent<Transform>>>,
+    current_level: Res<CurrentLevel>,
+    level_assets: Res<Assets<Level>>,
+) {
+    /* TODO: Other stuff occupying the position need to be checked */
+    if let Some(level) = level_assets.get(&current_level.0) {
+        for event in move_forward_evr.read() {
+            if let Ok((grid_position, direction)) = query.get(event.entity) {
+                if let Ok(next_position) = grid_position.next(direction) {
+                    /* Check the outer boundaries */
+                    if next_position.y < level.grid.len()
+                        && next_position.x < level.grid[next_position.y].len()
+                    {
+                        /* Check for void */
+                        if !matches!(level.grid[next_position.y][next_position.x], Tile::Void) {
+                            commands
+                                .entity(event.entity)
+                                .insert(EaseTo::new(next_position));
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+fn face_direction(
+    mut commands: Commands,
+    mut face_direction_evr: EventReader<FaceDirection>,
+    directions: Query<&GridDirection, Without<EasingComponent<Transform>>>,
+) {
+    for event in face_direction_evr.read() {
+        if let Ok(_direction) = directions.get(event.entity) {
+            commands
+                .entity(event.entity)
+                .insert(EaseTo::new(event.direction));
+        }
+    }
+}
+
 fn grid_position_to_translation(
     mut query: Query<(&mut Transform, &GridPosition), Changed<GridPosition>>,
 ) {
@@ -138,39 +242,16 @@ fn direction_to_rotation(
     }
 }
 
-fn move_forward(
-    mut move_forward_evr: EventReader<MoveForward>,
-    mut query: Query<(&mut GridPosition, &GridDirection)>,
-    current_level: Res<CurrentLevel>,
-    level_assets: Res<Assets<Level>>,
+fn end_of_ease<T: Component + Copy>(
+    mut commands: Commands,
+    mut removed: RemovedComponents<EasingComponent<Transform>>,
+    mut query: Query<(&mut T, &EaseTo<T>)>,
 ) {
-    /* TODO: Other stuff occupying the position need to be checked */
-    if let Some(level) = level_assets.get(&current_level.0) {
-        for event in move_forward_evr.read() {
-            if let Ok((mut grid_position, direction)) = query.get_mut(event.entity) {
-                if let Ok(next_position) = grid_position.next(direction) {
-                    /* Check the outer boundaries */
-                    if next_position.y < level.grid.len()
-                        && next_position.x < level.grid[next_position.y].len()
-                    {
-                        /* Check for void */
-                        if !matches!(level.grid[next_position.y][next_position.x], Tile::Void) {
-                            *grid_position = next_position;
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+    for entity in removed.read() {
+        if let Ok((mut component, ease_to)) = query.get_mut(entity) {
+            *component = ease_to.target;
 
-fn face_direction(
-    mut face_direction_evr: EventReader<FaceDirection>,
-    mut directions: Query<&mut GridDirection>,
-) {
-    for event in face_direction_evr.read() {
-        if let Ok(mut direction) = directions.get_mut(event.entity) {
-            *direction = event.direction;
+            commands.entity(entity).remove::<EaseTo<T>>();
         }
     }
 }

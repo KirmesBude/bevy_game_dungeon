@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_easings::EasingComponent;
 use bevy_flycam::FlyCam;
 
 use crate::{
@@ -49,7 +50,7 @@ pub fn setup(
 
 pub fn change_level(
     mut change_level_evw: EventWriter<ChangeLevel>,
-    player_pos: Query<&GridPosition, With<Player>>,
+    player_pos: Query<&GridPosition, (With<Player>, Without<EasingComponent<Transform>>)>,
     current_level: Res<CurrentLevel>,
     level_assets: Res<Assets<Level>>,
     levels: Res<LevelAssets>,

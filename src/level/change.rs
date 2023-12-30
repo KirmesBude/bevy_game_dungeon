@@ -4,7 +4,7 @@ use bevy_flycam::FlyCam;
 
 use crate::{
     controls::Controllable,
-    loading::LevelAssets,
+    loading::{LevelAssets, SceneAssets},
     movement::{GridDirection, GridPosition},
 };
 
@@ -17,6 +17,7 @@ pub fn setup(
     mut commands: Commands,
     mut change_level_evw: EventWriter<ChangeLevel>,
     level_assets: Res<LevelAssets>,
+    scene_assets: Res<SceneAssets>,
 ) {
     commands
         .spawn((
@@ -46,6 +47,8 @@ pub fn setup(
     change_level_evw.send(ChangeLevel(
         level_assets.levels.get("level/000.lvl").unwrap().clone(),
     ));
+
+    commands.spawn(scene_assets.chest());
 }
 
 pub fn change_level(

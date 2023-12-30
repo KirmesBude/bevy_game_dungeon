@@ -14,6 +14,7 @@ impl Plugin for LoadingPlugin {
         )
         .add_collection_to_loading_state::<_, TextureAssets>(GameState::Loading)
         .add_collection_to_loading_state::<_, TileTextureAssets>(GameState::Loading)
+        .add_collection_to_loading_state::<_, SceneAssets>(GameState::Loading)
         .add_collection_to_loading_state::<_, LevelAssets>(GameState::Loading);
     }
 }
@@ -40,4 +41,30 @@ pub struct TileTextureAssets {
     #[asset(standard_material)]
     #[asset(path = "stone.png")]
     pub stone: Handle<StandardMaterial>,
+}
+
+#[derive(Debug, AssetCollection, Resource)]
+pub struct SceneAssets {
+    #[asset(path = "models/KayKit_DungeonRemastered_1.0_FREE/chest.glb")]
+    pub chest: Handle<Scene>,
+    #[asset(path = "models/KayKit_DungeonRemastered_1.0_FREE/floor_tile_large.gltf.glb")]
+    pub floor_tile: Handle<Scene>,
+    #[asset(path = "models/KayKit_DungeonRemastered_1.0_FREE/key.gltf.glb")]
+    pub key: Handle<Scene>,
+    #[asset(path = "models/KayKit_DungeonRemastered_1.0_FREE/torch_mounted.gltf.glb")]
+    pub torch: Handle<Scene>,
+    #[asset(path = "models/KayKit_DungeonRemastered_1.0_FREE/wall.gltf.glb")]
+    pub wall: Handle<Scene>,
+    #[asset(path = "models/KayKit_DungeonRemastered_1.0_FREE/wall_doorway.glb")]
+    pub door: Handle<Scene>,
+}
+
+impl SceneAssets {
+    pub fn chest(&self) -> SceneBundle {
+        SceneBundle {
+            scene: self.chest.clone(),
+            transform: Transform::from_translation(Vec3::new(0.0, -16.0, -6.0)).with_scale(Vec3::splat(10.0)),
+            ..Default::default()
+        }
+    }
 }

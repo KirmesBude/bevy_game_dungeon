@@ -99,6 +99,14 @@ fn create_level_geometry(commands: &mut Commands, level: &Level, scene_assets: &
             }
         }
     }
+
+    /* Interactables */
+    for (k, v) in &level.interactables {
+        let transform = Transform::from_translation(k.into());
+        commands
+            .spawn(v.bundle(scene_assets, transform))
+            .insert(LevelGeometry);
+    }
 }
 
 fn despawn_level_geometry(commands: &mut Commands, entities: &Query<Entity, With<LevelGeometry>>) {
@@ -127,9 +135,9 @@ pub fn level_change_create(
 ) {
     for event in change_level_evr.read() {
         info!("Creating...");
-        current_level.0 = event.0.clone();
+        current_level.0 = event.level.clone();
 
-        let level = level_assets.get(&event.0).unwrap();
+        let level = level_assets.get(&event.level).unwrap();
 
         create_level_geometry(&mut commands, level, &scene_assets);
     }
@@ -142,10 +150,17 @@ pub fn move_player_to_start_pos(
 ) {
     for event in change_level_evr.read() {
         info!("Moving player to start...");
-        let level = level_assets.get(&event.0).unwrap();
+
+        let new_position = match event.position {
+            Some(position) => position,
+            None => {
+                let level = level_assets.get(&event.level).unwrap();
+                level.start_pos
+            }
+        };
 
         for (mut grid_position, mut grid_direction) in &mut player_pos {
-            *grid_position = level.start_pos;
+            *grid_position = new_position;
             *grid_direction = GridDirection::default();
         }
     }

@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
+    level::{CurrentLevel, Interact, Level},
     movement::{FaceDirection, GridDirection, GridPosition, MoveForward},
     GameState,
 };
@@ -11,7 +12,11 @@ impl Plugin for ControlsPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(
             Update,
-            (move_forwards_controls, face_direction_controls)
+            (
+                move_forwards_controls,
+                face_direction_controls,
+                interact_controls,
+            )
                 .chain()
                 .run_if(in_state(GameState::Playing)),
         );
@@ -54,6 +59,30 @@ fn move_forwards_controls(
     for entity in &grid_positions {
         if key_input.just_pressed(KeyCode::Up) {
             move_forward_evw.send(MoveForward { entity });
+        }
+    }
+}
+
+/* TODO: I would much rather get the entity here and send that in the Interact event */
+fn interact_controls(
+    key_input: Res<Input<KeyCode>>,
+    controllables: Query<(Entity, &GridPosition, &GridDirection), With<Controllable>>,
+    current_level: Res<CurrentLevel>,
+    level_assets: Res<Assets<Level>>,
+    mut interact_evw: EventWriter<Interact>,
+) {
+    for (entity, grid_position, direction) in &controllables {
+        if key_input.just_pressed(KeyCode::Space) {
+            if let Ok(interact_position) = grid_position.next(direction) {
+                if let Some(level) = level_assets.get(&current_level.0) {
+                    if let Some(interactable) = level.interactables.get(&interact_position) {
+                        interact_evw.send(Interact {
+                            source: entity,
+                            target: interactable.clone(),
+                        })
+                    }
+                }
+            }
         }
     }
 }

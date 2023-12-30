@@ -3,21 +3,21 @@ use thiserror::Error;
 
 use crate::movement::GridPosition;
 
-use super::Tile;
+use super::{interactables::Interactable, Tile};
 
 use bevy::{
     asset::{io::Reader, AssetLoader, AsyncReadExt, LoadContext},
     prelude::*,
     reflect::TypePath,
-    utils::BoxedFuture,
+    utils::{BoxedFuture, HashMap},
 };
 
 #[derive(Debug, Default, Deserialize, Asset, TypePath)]
 pub struct Level {
     pub grid: Vec<Vec<Tile>>,
     pub start_pos: GridPosition,
-    pub end_pos: GridPosition,
-    pub next_level: Option<String>,
+    #[serde(default)]
+    pub interactables: HashMap<GridPosition, Interactable>,
 }
 
 #[non_exhaustive]

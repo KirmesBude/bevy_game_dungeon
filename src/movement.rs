@@ -40,7 +40,7 @@ impl Plugin for MovementPlugin {
     }
 }
 
-#[derive(Default, Debug, Component, Clone, Copy, Deserialize, PartialEq, Eq)]
+#[derive(Default, Debug, Component, Clone, Copy, Deserialize, PartialEq, Eq, Hash)]
 pub struct GridPosition {
     pub x: usize,
     pub y: usize,
@@ -207,9 +207,12 @@ fn move_forward(
                     {
                         /* Check for void */
                         if !matches!(level.grid[next_position.y][next_position.x], Tile::Void) {
-                            commands
-                                .entity(event.entity)
-                                .insert(EaseTo::new(next_position));
+                            /* Check for Interactables */
+                            if !level.interactables.contains_key(&next_position) {
+                                commands
+                                    .entity(event.entity)
+                                    .insert(EaseTo::new(next_position));
+                            }
                         }
                     }
                 }

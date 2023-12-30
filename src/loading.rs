@@ -49,6 +49,8 @@ pub struct SceneAssets {
     wall: Handle<Scene>,
     #[asset(path = "models/KayKit_DungeonRemastered_1.0_FREE/wall_doorway.glb#Scene0")]
     _door: Handle<Scene>,
+    #[asset(path = "models/KayKit_DungeonRemastered_1.0_FREE/pillar_decorated.gltf.glb#Scene0")]
+    pillar: Handle<Scene>,
 }
 
 impl SceneAssets {
@@ -75,6 +77,16 @@ impl SceneAssets {
         transform.translation += Vec3::new(0.0, -16.0, 0.0);
         SceneBundle {
             scene: self.wall.clone(),
+            transform: transform.with_scale(Vec3::splat(8.0)),
+            ..Default::default()
+        }
+    }
+
+    pub fn pillar(&self, transform: Transform) -> SceneBundle {
+        let mut transform = transform;
+        transform.translation += Vec3::new(0.0, -16.0, 0.0);
+        SceneBundle {
+            scene: self.pillar.clone(),
             transform: transform.with_scale(Vec3::splat(8.0)),
             ..Default::default()
         }

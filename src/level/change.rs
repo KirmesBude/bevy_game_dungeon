@@ -1,23 +1,24 @@
 use bevy::prelude::*;
-use bevy_easings::EasingComponent;
 use bevy_flycam::FlyCam;
 
 use crate::{
     controls::Controllable,
-    loading::{LevelAssets, SceneAssets},
+    loading::LevelAssets,
     movement::{GridDirection, GridPosition},
 };
 
-use super::{CurrentLevel, Level, Player};
+use super::{Level, Player};
 
 #[derive(Debug, Event)]
-pub struct ChangeLevel(pub Handle<Level>);
+pub struct ChangeLevel {
+    pub level: Handle<Level>,
+    pub position: Option<GridPosition>,
+}
 
 pub fn setup(
     mut commands: Commands,
     mut change_level_evw: EventWriter<ChangeLevel>,
     level_assets: Res<LevelAssets>,
-    scene_assets: Res<SceneAssets>,
 ) {
     commands
         .spawn((
@@ -44,29 +45,8 @@ pub fn setup(
             parent.spawn(Camera3dBundle::default());
         });
 
-    change_level_evw.send(ChangeLevel(
-        level_assets.levels.get("level/000.lvl").unwrap().clone(),
-    ));
-
-    commands.spawn(scene_assets.chest(Transform::from_translation(Vec3::ZERO)));
-}
-
-pub fn change_level(
-    mut change_level_evw: EventWriter<ChangeLevel>,
-    player_pos: Query<&GridPosition, (With<Player>, Without<EasingComponent<Transform>>)>,
-    current_level: Res<CurrentLevel>,
-    level_assets: Res<Assets<Level>>,
-    levels: Res<LevelAssets>,
-) {
-    if let Some(level) = level_assets.get(&current_level.0) {
-        if let Some(next_level) = &level.next_level {
-            for position in &player_pos {
-                if position == &level.end_pos {
-                    change_level_evw
-                        .send(ChangeLevel(levels.levels.get(next_level).unwrap().clone()));
-                    return;
-                }
-            }
-        }
-    }
+    change_level_evw.send(ChangeLevel {
+        level: level_assets.levels.get("level/000.lvl").unwrap().clone(),
+        position: None,
+    });
 }

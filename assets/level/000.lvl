@@ -13,9 +13,22 @@
         x: 1,
         y: 1,
     ),
-    end_pos: (
-        x: 4,
-        y: 7
-    ),
-    next_level: Some("level/001.lvl"),
+    interactables: {
+        (
+            x: 0,
+            y: 0,
+        ) : Chest(Key),
+        (
+            x: 4,
+            y: 7,
+        ) : Teleporter(
+            (
+                grid_position: (
+                    x: 0,
+                    y: 1,
+                ),
+                level: Some("level/001.lvl"),
+            )
+        ),
+    },
 )

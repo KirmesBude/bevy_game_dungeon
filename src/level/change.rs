@@ -48,7 +48,7 @@ pub fn setup(
         level_assets.levels.get("level/000.lvl").unwrap().clone(),
     ));
 
-    commands.spawn(scene_assets.chest());
+    commands.spawn(scene_assets.chest(Transform::from_translation(Vec3::ZERO)));
 }
 
 pub fn change_level(

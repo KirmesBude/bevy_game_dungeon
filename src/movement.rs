@@ -92,6 +92,12 @@ impl From<&GridDirection> for Vec3 {
     }
 }
 
+impl From<GridDirection> for Vec3 {
+    fn from(direction: GridDirection) -> Self {
+        (&direction).into()
+    }
+}
+
 impl GridDirection {
     pub fn front(&self) -> Self {
         *self

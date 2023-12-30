@@ -1,60 +1,27 @@
 use bevy::prelude::*;
 
 use crate::{
-    loading::TileTextureAssets,
+    loading::SceneAssets,
     movement::{GridDirection, GridPosition},
 };
 
 use super::{asset::Level, change::ChangeLevel, CurrentLevel, Player, Tile, TILE_SIZE};
 
-/// Holds a Handle to a Level Asset of the currently loaded level
-#[derive(Debug, Resource, Deref)]
-pub struct TileMesh(Handle<Mesh>);
-
-impl FromWorld for TileMesh {
-    fn from_world(world: &mut World) -> Self {
-        let mut meshes: Mut<Assets<Mesh>> = world.get_resource_mut().unwrap();
-
-        TileMesh(meshes.add(shape::Plane::from_size(TILE_SIZE).into()))
-    }
-}
-
-impl TileTextureAssets {
-    pub fn get(&self, tile: &Tile) -> Option<Handle<StandardMaterial>> {
-        match tile {
-            Tile::Stone => Some(self.stone.clone()),
-            Tile::Void => None,
-        }
-    }
-}
-
 /// Marker Component so all level specific entities can be despawned of level change
 #[derive(Debug, Default, Component)]
 pub struct LevelGeometry;
 
-fn create_level_geometry(
-    commands: &mut Commands,
-    level: &Level,
-    tile_mesh: &Handle<Mesh>,
-    tile_textures: &TileTextureAssets,
-) {
+fn create_level_geometry(commands: &mut Commands, level: &Level, scene_assets: &SceneAssets) {
     for (y, row) in level.grid.iter().enumerate() {
         for (x, tile) in row.iter().enumerate() {
             match tile {
                 Tile::Void => { /* do nothing */ }
-                tile => {
-                    let material = tile_textures.get(tile).unwrap();
-
+                _tile => {
                     /* Ground */
                     let translation =
                         Vec3::new(x as f32 * TILE_SIZE, -TILE_SIZE / 2.0, y as f32 * TILE_SIZE);
                     commands
-                        .spawn(PbrBundle {
-                            mesh: tile_mesh.clone(),
-                            material: material.clone(),
-                            transform: Transform::from_translation(translation),
-                            ..default()
-                        })
+                        .spawn(scene_assets.floor_tile(Transform::from_translation(translation)))
                         .insert(LevelGeometry);
 
                     /* North Wall */
@@ -63,13 +30,12 @@ fn create_level_geometry(
                             translation + Vec3::new(0.0, TILE_SIZE / 2.0, -TILE_SIZE / 2.0);
 
                         commands
-                            .spawn(PbrBundle {
-                                mesh: tile_mesh.clone(),
-                                material: material.clone(),
-                                transform: Transform::from_translation(translation)
-                                    .looking_to(Vec3::Y, Vec3::Z),
-                                ..default()
-                            })
+                            .spawn(
+                                scene_assets.wall(
+                                    Transform::from_translation(translation)
+                                        .looking_to(GridDirection::North.into(), Vec3::Y),
+                                ),
+                            )
                             .insert(LevelGeometry);
                     }
                     /* South Wall */
@@ -78,13 +44,12 @@ fn create_level_geometry(
                             translation + Vec3::new(0.0, TILE_SIZE / 2.0, TILE_SIZE / 2.0);
 
                         commands
-                            .spawn(PbrBundle {
-                                mesh: tile_mesh.clone(),
-                                material: material.clone(),
-                                transform: Transform::from_translation(translation)
-                                    .looking_to(Vec3::Y, -Vec3::Z),
-                                ..default()
-                            })
+                            .spawn(
+                                scene_assets.wall(
+                                    Transform::from_translation(translation)
+                                        .looking_to(GridDirection::South.into(), Vec3::Y),
+                                ),
+                            )
                             .insert(LevelGeometry);
                     }
                     /* West Wall */
@@ -93,13 +58,12 @@ fn create_level_geometry(
                             translation + Vec3::new(-TILE_SIZE / 2.0, TILE_SIZE / 2.0, 0.0);
 
                         commands
-                            .spawn(PbrBundle {
-                                mesh: tile_mesh.clone(),
-                                material: material.clone(),
-                                transform: Transform::from_translation(translation)
-                                    .looking_to(Vec3::Y, Vec3::X),
-                                ..default()
-                            })
+                            .spawn(
+                                scene_assets.wall(
+                                    Transform::from_translation(translation)
+                                        .looking_to(GridDirection::West.into(), Vec3::Y),
+                                ),
+                            )
                             .insert(LevelGeometry);
                     }
                     /* East Wall */
@@ -109,17 +73,17 @@ fn create_level_geometry(
                             translation + Vec3::new(TILE_SIZE / 2.0, TILE_SIZE / 2.0, 0.0);
 
                         commands
-                            .spawn(PbrBundle {
-                                mesh: tile_mesh.clone(),
-                                material: material.clone(),
-                                transform: Transform::from_translation(translation)
-                                    .looking_to(Vec3::Y, -Vec3::X),
-                                ..default()
-                            })
+                            .spawn(
+                                scene_assets.wall(
+                                    Transform::from_translation(translation)
+                                        .looking_to(GridDirection::East.into(), Vec3::Y),
+                                ),
+                            )
                             .insert(LevelGeometry);
                     }
 
                     /* Ceiling */
+                    /*
                     let translation =
                         Vec3::new(x as f32 * TILE_SIZE, TILE_SIZE / 2.0, y as f32 * TILE_SIZE);
                     commands
@@ -130,6 +94,7 @@ fn create_level_geometry(
                             ..default()
                         })
                         .insert(LevelGeometry);
+                    */
                 }
             }
         }
@@ -157,9 +122,8 @@ pub fn level_change_create(
     mut commands: Commands,
     mut change_level_evr: EventReader<ChangeLevel>,
     mut current_level: ResMut<CurrentLevel>,
-    tile_mesh: Res<TileMesh>,
-    tile_textures: Res<TileTextureAssets>,
     level_assets: Res<Assets<Level>>,
+    scene_assets: Res<SceneAssets>,
 ) {
     for event in change_level_evr.read() {
         info!("Creating...");
@@ -167,7 +131,7 @@ pub fn level_change_create(
 
         let level = level_assets.get(&event.0).unwrap();
 
-        create_level_geometry(&mut commands, level, &tile_mesh.0, &tile_textures);
+        create_level_geometry(&mut commands, level, &scene_assets);
     }
 }
 

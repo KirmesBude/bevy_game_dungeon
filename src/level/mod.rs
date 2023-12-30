@@ -10,7 +10,7 @@ use crate::GameState;
 use self::{
     asset::LevelAssetLoader,
     change::{change_level, setup, ChangeLevel},
-    create::{level_change_create, level_change_despawn, move_player_to_start_pos, TileMesh},
+    create::{level_change_create, level_change_despawn, move_player_to_start_pos},
 };
 
 pub use asset::Level;
@@ -24,7 +24,6 @@ pub struct LevelPlugin;
 impl Plugin for LevelPlugin {
     fn build(&self, app: &mut App) {
         app.init_resource::<CurrentLevel>()
-            .init_resource::<TileMesh>()
             .init_asset::<Level>()
             .init_asset_loader::<LevelAssetLoader>()
             .add_event::<ChangeLevel>()

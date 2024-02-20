@@ -12,7 +12,7 @@ use self::{
     asset::LevelAssetLoader,
     change::{setup, ChangeLevel},
     create::{level_change_create, level_change_despawn, move_player_to_start_pos},
-    interactables::InteractablePlugin,
+    interactables::{interact, InteractablePlugin},
 };
 
 pub use asset::Level;
@@ -40,7 +40,8 @@ impl Plugin for LevelPlugin {
                     move_player_to_start_pos,
                 )
                     .chain()
-                    .run_if(in_state(GameState::Playing)),
+                    .run_if(in_state(GameState::Playing))
+                    .after(interact), /* There is probably a better way for this */
             );
     }
 }

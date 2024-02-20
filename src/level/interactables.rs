@@ -53,7 +53,7 @@ pub struct Teleporter {
     level: Option<String>,
 }
 
-fn interact(
+pub fn interact(
     mut interact_evr: EventReader<Interact>,
     mut change_level_evw: EventWriter<ChangeLevel>,
     level_assets: Res<LevelAssets>,

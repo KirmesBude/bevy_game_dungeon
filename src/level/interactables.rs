@@ -66,10 +66,12 @@ fn interact(
             Interactable::Teleporter(teleporter) => {
                 info!("Interact with Teleporter{:?}", teleporter);
                 match &teleporter.level {
-                    Some(level_name) => change_level_evw.send(ChangeLevel {
-                        level: level_assets.levels.get(level_name).unwrap().clone(),
-                        position: Some(teleporter.grid_position),
-                    }),
+                    Some(level_name) => {
+                        change_level_evw.send(ChangeLevel {
+                            level: level_assets.levels.get(level_name).unwrap().clone(),
+                            position: Some(teleporter.grid_position),
+                        });
+                    }
                     None => {
                         if let Ok(mut position) = positions.get_mut(event.source) {
                             *position = teleporter.grid_position;

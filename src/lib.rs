@@ -42,7 +42,7 @@ pub struct GamePlugin;
 
 impl Plugin for GamePlugin {
     fn build(&self, app: &mut App) {
-        app.add_state::<GameState>().add_plugins((
+        app.init_state::<GameState>().add_plugins((
             LoadingPlugin,
             MenuPlugin,
             LevelPlugin,
@@ -55,7 +55,7 @@ impl Plugin for GamePlugin {
         {
             app.add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default()));
             app.add_plugins(
-                WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::I)),
+                WorldInspectorPlugin::default().run_if(input_toggle_active(true, KeyCode::KeyI)),
             );
             app.add_plugins(NoCameraPlayerPlugin);
         }

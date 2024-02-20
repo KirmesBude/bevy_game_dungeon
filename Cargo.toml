@@ -27,11 +27,11 @@ dev = [
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy = "0.12"
-bevy_asset_loader = {version = "0.18", features = ["3d"]}
-bevy-inspector-egui = "0.21"
-bevy_flycam = "0.12"
-bevy_easings = "0.12"
+bevy = "0.13"
+bevy_asset_loader = {version = "0.20", features = ["3d"]}
+bevy-inspector-egui = { git = "https://github.com/Aztro-dev/bevy-inspector-egui.git", branch = "main" }
+bevy_flycam = { git = "https://github.com/arcashka/bevy_flycam.git", branch = "bevy_main_0_13" }
+bevy_easings = "0.13"
 
 webbrowser = { version = "0.8", features = ["hardened"] }
 ron = "0.8"

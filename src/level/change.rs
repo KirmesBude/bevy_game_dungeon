@@ -33,7 +33,7 @@ pub fn setup(
             parent.spawn(PointLightBundle {
                 point_light: PointLight {
                     color: Color::YELLOW,
-                    intensity: 9000.0,
+                    intensity: 15_000_000.0,
                     range: 64.0,
                     radius: 64.0,
                     shadows_enabled: true,

@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{color::palettes::css::YELLOW, prelude::*};
 use bevy_flycam::FlyCam;
 
 use crate::{
@@ -32,7 +32,7 @@ pub fn setup(
         .with_children(|parent| {
             parent.spawn(PointLightBundle {
                 point_light: PointLight {
-                    color: Color::YELLOW,
+                    color: YELLOW.into(),
                     intensity: 15_000_000.0,
                     range: 64.0,
                     radius: 64.0,

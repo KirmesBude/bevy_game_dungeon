@@ -33,7 +33,7 @@ fn create_level_geometry(commands: &mut Commands, level: &Level, scene_assets: &
                             .spawn(
                                 scene_assets.wall(
                                     Transform::from_translation(translation)
-                                        .looking_to(GridDirection::North.into(), Vec3::Y),
+                                        .looking_to(GridDirection::North, Vec3::Y),
                                 ),
                             )
                             .insert(LevelGeometry);
@@ -47,7 +47,7 @@ fn create_level_geometry(commands: &mut Commands, level: &Level, scene_assets: &
                             .spawn(
                                 scene_assets.wall(
                                     Transform::from_translation(translation)
-                                        .looking_to(GridDirection::South.into(), Vec3::Y),
+                                        .looking_to(GridDirection::South, Vec3::Y),
                                 ),
                             )
                             .insert(LevelGeometry);
@@ -61,7 +61,7 @@ fn create_level_geometry(commands: &mut Commands, level: &Level, scene_assets: &
                             .spawn(
                                 scene_assets.wall(
                                     Transform::from_translation(translation)
-                                        .looking_to(GridDirection::West.into(), Vec3::Y),
+                                        .looking_to(GridDirection::West, Vec3::Y),
                                 ),
                             )
                             .insert(LevelGeometry);
@@ -76,7 +76,7 @@ fn create_level_geometry(commands: &mut Commands, level: &Level, scene_assets: &
                             .spawn(
                                 scene_assets.wall(
                                     Transform::from_translation(translation)
-                                        .looking_to(GridDirection::East.into(), Vec3::Y),
+                                        .looking_to(GridDirection::East, Vec3::Y),
                                 ),
                             )
                             .insert(LevelGeometry);

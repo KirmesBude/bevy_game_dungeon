@@ -98,6 +98,23 @@ impl From<GridDirection> for Vec3 {
     }
 }
 
+impl From<&GridDirection> for Dir3 {
+    fn from(direction: &GridDirection) -> Self {
+        match direction {
+            GridDirection::North => Dir3::NEG_Z,
+            GridDirection::East => Dir3::X,
+            GridDirection::South => Dir3::Z,
+            GridDirection::West => Dir3::NEG_X,
+        }
+    }
+}
+
+impl From<GridDirection> for Dir3 {
+    fn from(direction: GridDirection) -> Self {
+        (&direction).into()
+    }
+}
+
 impl GridDirection {
     pub fn front(&self) -> Self {
         *self
@@ -177,7 +194,7 @@ fn ease_direction_to_rotation(
 ) {
     for (entity, transform, direction) in &query {
         let new_direction = &direction.target;
-        let new_transform = transform.looking_to(new_direction.into(), Vec3::Y);
+        let new_transform = transform.looking_to(new_direction, Vec3::Y);
 
         commands.entity(entity).insert(transform.ease_to(
             new_transform,
@@ -247,7 +264,7 @@ fn direction_to_rotation(
     mut query: Query<(&mut Transform, &GridDirection), Changed<GridDirection>>,
 ) {
     for (mut transform, direction) in &mut query {
-        transform.look_to(direction.into(), Vec3::Y);
+        transform.look_to(direction, Vec3::Y);
     }
 }
 
